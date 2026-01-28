@@ -1,18 +1,44 @@
 {
-  "name": "kirti",
+  "name": "kirit",
   "version": "1.0.0",
-  "description": "A CLI for quick notes, todos, and brainstorming",
+  "description": "A CLI for quick notes, todos, and brainstorming - your second brain in the terminal",
   "type": "module",
+  "main": "bin/kirit.js",
   "bin": {
-    "kirti": "./bin/kirti.js"
+    "kirit": "./bin/kirit.js"
   },
-  "main": "index.js",
+  "files": [
+    "bin/",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["cli", "notes", "todo", "productivity", "brainstorming"],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "cli",
+    "notes",
+    "todo",
+    "productivity",
+    "brainstorming",
+    "task-manager",
+    "developer-tools",
+    "terminal",
+    "command-line"
+  ],
+  "author": "Mohamed",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/kirit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/kirit/issues"
+  },
+  "homepage": "https://github.com/yourusername/kirit#readme",
+  "engines": {
+    "node": ">=16.0.0"
+  },
   "dependencies": {
     "boxen": "^8.0.1",
     "chalk": "^5.6.2",

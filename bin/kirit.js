@@ -13,16 +13,16 @@ import os from "os";
 
 const program = new Command();
 
-// Storage directory for Kirti data
-const KIRTI_DIR = path.join(os.homedir(), ".kirti");
-const NOTES_FILE = path.join(KIRTI_DIR, "notes.json");
-const TODOS_FILE = path.join(KIRTI_DIR, "todos.json");
-const IDEAS_FILE = path.join(KIRTI_DIR, "ideas.json");
+// Storage directory for kirit data
+const kirit_DIR = path.join(os.homedir(), ".kirit");
+const NOTES_FILE = path.join(kirit_DIR, "notes.json");
+const TODOS_FILE = path.join(kirit_DIR, "todos.json");
+const IDEAS_FILE = path.join(kirit_DIR, "ideas.json");
 
 // Ensure storage exists
 function initStorage() {
-  if (!fs.existsSync(KIRTI_DIR)) {
-    fs.mkdirSync(KIRTI_DIR, { recursive: true });
+  if (!fs.existsSync(kirit_DIR)) {
+    fs.mkdirSync(kirit_DIR, { recursive: true });
   }
   [NOTES_FILE, TODOS_FILE, IDEAS_FILE].forEach(file => {
     if (!fs.existsSync(file)) {
@@ -52,7 +52,7 @@ function generateId() {
 
 // Banner display
 function banner() {
-  const text = figlet.textSync("KIRTI", { font: "Small", horizontalLayout: "fitted" });
+  const text = figlet.textSync("KIRIT", { font: "Small", horizontalLayout: "fitted" });
   const colored = gradient.cristal.multiline(text);
   const subtitle = chalk.dim("Quick notes • Todos • Ideas • v1.0.0");
   console.log(boxen(`${colored}\n${subtitle}`, {
@@ -72,7 +72,7 @@ function error(msg) { console.log(chalk.redBright("✖ ") + msg); }
 initStorage();
 
 program
-  .name("kirti")
+  .name("kirit")
   .description("A CLI for quick notes, todos, and brainstorming")
   .version("1.0.0");
 
@@ -114,32 +114,37 @@ program
     
     success("Note saved!");
     console.log(chalk.dim(`  "${truncate(content, 50)}"`));
-    console.log(chalk.dim(`  Use "kirti notes" to view all notes`));
+    console.log(chalk.dim(`  Use "kirit notes" to view all notes`));
   });
 
 program
   .command("notes")
   .description("List all notes")
   .option("-s, --search <query>", "Search notes")
+  .option("-S, --SEARCH <query>", "Search notes (case-insensitive)")
   .option("-t, --tag <tag>", "Filter by tag")
+  .option("-T, --TAG <tag>", "Filter by tag (case-insensitive)")
   .action((opts) => {
     banner();
     
     let notes = loadData(NOTES_FILE);
     
-    if (opts.search) {
+    const searchQuery = opts.search || opts.SEARCH;
+    const tagFilter = opts.tag || opts.TAG;
+    
+    if (searchQuery) {
       notes = notes.filter(n => 
-        n.content.toLowerCase().includes(opts.search.toLowerCase())
+        n.content.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
     
-    if (opts.tag) {
-      notes = notes.filter(n => n.tags.includes(opts.tag.toLowerCase()));
+    if (tagFilter) {
+      notes = notes.filter(n => n.tags.includes(tagFilter.toLowerCase()));
     }
     
     if (notes.length === 0) {
       info("No notes found");
-      console.log(chalk.dim("  Add one with: kirti note <content>"));
+      console.log(chalk.dim("  Add one with: kirit note <content>"));
       return;
     }
     
@@ -195,7 +200,8 @@ program
   .alias("td")
   .description("Add a todo item")
   .argument("[task...]", "Task description")
-  .option("-p, --priority <level>", "Priority: high, medium, low", "medium")
+  .option("-p, --priority <level>", "Priority: high, medium, low")
+  .option("-P, --Priority <level>", "Priority: high, medium, low (case-insensitive)")
   .action(async (taskArgs, opts) => {
     banner();
     
@@ -219,14 +225,14 @@ program
     const todo = {
       id: generateId(),
       task: task.trim(),
-      priority: opts.priority,
+      priority: (opts.Priority || opts.priority || "medium").toLowerCase(),
       done: false,
       createdAt: new Date().toISOString()
     };
     todos.unshift(todo);
     saveData(TODOS_FILE, todos);
     
-    success(`Todo added! [${opts.priority.toUpperCase()}]`);
+    success(`Todo added! [${(opts.Priority || opts.priority || "medium").toUpperCase()}]`);
     console.log(chalk.dim(`  "${truncate(task, 50)}"`));
   });
 
@@ -234,18 +240,19 @@ program
   .command("todos")
   .description("List all todos")
   .option("-a, --all", "Show completed todos too")
+  .option("-A, --ALL", "Show completed todos too (case-insensitive)")
   .action((opts) => {
     banner();
     
     let todos = loadData(TODOS_FILE);
     
-    if (!opts.all) {
+    if (!opts.all && !opts.ALL) {
       todos = todos.filter(t => !t.done);
     }
     
     if (todos.length === 0) {
       success("No pending todos! 🎉");
-      console.log(chalk.dim("  Add one with: kirti todo <task>"));
+      console.log(chalk.dim("  Add one with: kirit todo <task>"));
       return;
     }
     
@@ -258,7 +265,7 @@ program
       const text = todo.done ? chalk.strikethrough(todo.task) : todo.task;
       
       console.log(`${status} ${priority} ${text}`);
-      console.log(chalk.dim(`   ${date} • kirti done ${idx + 1}`));
+      console.log(chalk.dim(`   ${date} • kirit done ${idx + 1}`));
     });
   });
 
@@ -367,6 +374,7 @@ program
   .command("ideas")
   .description("List all ideas")
   .option("-s, --sort <by>", "Sort by: new, votes", "new")
+  .option("-S, --SORT <by>", "Sort by: new, votes (case-insensitive)")
   .action((opts) => {
     banner();
     
@@ -374,11 +382,12 @@ program
     
     if (ideas.length === 0) {
       info("No ideas captured yet");
-      console.log(chalk.dim("  Add one with: kirti idea <content>"));
+      console.log(chalk.dim("  Add one with: kirit idea <content>"));
       return;
     }
     
-    if (opts.sort === "votes") {
+    const sortBy = (opts.sort || opts.SORT || "new").toLowerCase();
+    if (sortBy === "votes") {
       ideas.sort((a, b) => b.votes - a.votes);
     }
     
@@ -390,7 +399,7 @@ program
       const date = formatDate(idea.createdAt);
       
       console.log(`${chalk.cyan(`${idx + 1}.`)} ${status} ${idea.content}`);
-      console.log(chalk.dim(`   ${votes} • ${date} • kirti upvote ${idx + 1}`));
+      console.log(chalk.dim(`   ${votes} • ${date} • kirit upvote ${idx + 1}`));
     });
   });
 
@@ -536,11 +545,13 @@ program
   .command("clear")
   .description("Clear completed todos or all data")
   .option("-t, --todos", "Clear completed todos")
+  .option("-T, --TODOS", "Clear completed todos (case-insensitive)")
   .option("-a, --all", "Clear ALL data (⚠️ destructive)")
+  .option("-A, --ALL", "Clear ALL data (case-insensitive)")
   .action(async (opts) => {
     banner();
     
-    if (opts.all) {
+    if (opts.all || opts.ALL) {
       const { confirm } = await inquirer.prompt([{
         name: "confirm",
         message: "Delete ALL notes, todos, and ideas? This cannot be undone!",
@@ -559,7 +570,7 @@ program
       return;
     }
     
-    if (opts.todos) {
+    if (opts.todos || opts.TODOS) {
       const todos = loadData(TODOS_FILE);
       const remaining = todos.filter(t => !t.done);
       const cleared = todos.length - remaining.length;
@@ -620,17 +631,17 @@ program.configureHelp({
 
 program.addHelpText("after", `
 ${chalk.bold("Quick Examples:")}
-  ${chalk.cyan("kirti note")}              Add a note interactively
-  ${chalk.cyan("kirti note Buy milk")}     Quick note from command line
-  ${chalk.cyan("kirti todo Fix bug -p high")}  Add high priority todo
-  ${chalk.cyan("kirti todos")}             View pending todos
-  ${chalk.cyan("kirti done 1")}            Mark todo #1 as complete
-  ${chalk.cyan("kirti idea")}              Capture an idea
-  ${chalk.cyan("kirti ideas")}             List all ideas
-  ${chalk.cyan("kirti search bug")}        Search everything
-  ${chalk.cyan("kirti stats")}             View your productivity
+  ${chalk.cyan("kirit note")}              Add a note interactively
+  ${chalk.cyan("kirit note Buy milk")}     Quick note from command line
+  ${chalk.cyan("kirit todo Fix bug -p high")}  Add high priority todo
+  ${chalk.cyan("kirit todos")}             View pending todos
+  ${chalk.cyan("kirit done 1")}            Mark todo #1 as complete
+  ${chalk.cyan("kirit idea")}              Capture an idea
+  ${chalk.cyan("kirit ideas")}             List all ideas
+  ${chalk.cyan("kirit search bug")}        Search everything
+  ${chalk.cyan("kirit stats")}             View your productivity
 
-${chalk.dim("All data is stored in:")} ${chalk.gray(KIRTI_DIR)}
+${chalk.dim("All data is stored in:")} ${chalk.gray(kirit_DIR)}
 `);
 
 program.parse(process.argv);
