@@ -1,7 +1,0 @@
-node_modules/
-*.tgz
-.DS_Store
-Thumbs.db
-.vscode/
-.idea/
-.gitignore
