@@ -5,7 +5,7 @@
   "type": "module",
   "main": "bin/kirit.js",
   "bin": {
-    "kirit": "./bin/kirit.js"
+    "kirit": "bin/kirit.js"
   },
   "files": [
     "bin/",
