@@ -10,6 +10,11 @@ import Table from "cli-table3";
 import fs from "fs";
 import path from "path";
 import os from "os";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "package.json"), "utf-8"));
+const VERSION = packageJson.version;
 
 const program = new Command();
 
@@ -54,7 +59,7 @@ function generateId() {
 function banner() {
   const text = figlet.textSync("KIRIT", { font: "Small", horizontalLayout: "fitted" });
   const colored = gradient.cristal.multiline(text);
-  const subtitle = chalk.dim("Quick notes • Todos • Ideas • v1.0.0");
+  const subtitle = chalk.dim(`Quick notes • Todos • Ideas • v${VERSION}`);
   console.log(boxen(`${colored}\n${subtitle}`, {
     padding: 1,
     margin: 0,
@@ -74,7 +79,7 @@ initStorage();
 program
   .name("kirit")
   .description("A CLI for quick notes, todos, and brainstorming")
-  .version("1.0.0");
+  .version(VERSION);
 
 // ============ NOTES COMMANDS ============
 

@@ -26,16 +26,16 @@
     "terminal",
     "command-line"
   ],
-  "author": "Mohamed",
+  "author": "Mohamed Eltelb <mohamedeltep2017@gmail.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yourusername/kirit.git"
+    "url": "git+https://github.com/Mohamed-Eltelb/Kirit.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/kirit/issues"
+    "url": "https://github.com/Mohamed-Eltelb/Kirit/issues"
   },
-  "homepage": "https://github.com/yourusername/kirit#readme",
+  "homepage": "https://github.com/Mohamed-Eltelb/Kirit#readme",
   "engines": {
     "node": ">=16.0.0"
   },
