@@ -1,6 +1,6 @@
 {
   "name": "kirit",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A CLI for quick notes, todos, and brainstorming - your second brain in the terminal",
   "type": "module",
   "main": "bin/kirit.js",
