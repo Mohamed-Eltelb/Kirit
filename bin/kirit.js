@@ -246,6 +246,9 @@ program
   .description("List all todos")
   .option("-a, --all", "Show completed todos too")
   .option("-A, --ALL", "Show completed todos too (case-insensitive)")
+  .option("-s, --search <query>", "Search todos")
+  .option("-S, --SEARCH <query>", "Search todos (case-insensitive)")
+  .option("-p, --priority <level>", "Filter by priority (high/medium/low)")
   .action((opts) => {
     banner();
     
@@ -253,6 +256,17 @@ program
     
     if (!opts.all && !opts.ALL) {
       todos = todos.filter(t => !t.done);
+    }
+    
+    const searchQuery = opts.search || opts.SEARCH;
+    if (searchQuery) {
+      todos = todos.filter(t => 
+        t.task.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    
+    if (opts.priority) {
+      todos = todos.filter(t => t.priority === opts.priority.toLowerCase());
     }
     
     if (todos.length === 0) {
@@ -378,20 +392,29 @@ program
 program
   .command("ideas")
   .description("List all ideas")
-  .option("-s, --sort <by>", "Sort by: new, votes", "new")
-  .option("-S, --SORT <by>", "Sort by: new, votes (case-insensitive)")
+  .option("-o, --order <by>", "Sort by: new, votes", "new")
+  .option("-O, --ORDER <by>", "Sort by: new, votes (case-insensitive)")
+  .option("-s, --search <query>", "Search ideas")
+  .option("-S, --SEARCH <query>", "Search ideas (case-insensitive)")
   .action((opts) => {
     banner();
     
     let ideas = loadData(IDEAS_FILE);
     
+    const searchQuery = opts.search || opts.SEARCH;
+    if (searchQuery) {
+      ideas = ideas.filter(i => 
+        i.content.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    
     if (ideas.length === 0) {
-      info("No ideas captured yet");
+      info("No ideas found");
       console.log(chalk.dim("  Add one with: kirit idea <content>"));
       return;
     }
     
-    const sortBy = (opts.sort || opts.SORT || "new").toLowerCase();
+    const sortBy = (opts.order || opts.ORDER || "new").toLowerCase();
     if (sortBy === "votes") {
       ideas.sort((a, b) => b.votes - a.votes);
     }
@@ -631,7 +654,12 @@ function getStatusIcon(status) {
 // Help text
 program.configureHelp({
   sortSubcommands: true,
-  subcommandTerm: (cmd) => chalk.cyan(cmd.name()),
+  subcommandTerm: (cmd) => {
+    const alias = cmd.aliases()[0];
+    return alias 
+      ? chalk.cyan(`${cmd.name()}, ${alias}`)
+      : chalk.cyan(cmd.name());
+  },
 });
 
 program.addHelpText("after", `
